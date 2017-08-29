@@ -1,23 +1,17 @@
-cdef extern from "Rectangle.h" namespace "shapes":
-    cdef cppclass Rectangle:
-        Rectangle(int, int, int, int) except +
-        int x0, y0, x1, y1
-        int getLength()
-        int getHeight()
-        int getArea()
-        void move(int, int)
+cimport numpy as np
+import numpy as np
 
-cdef class PyRectangle:
-    cdef Rectangle *thisptr # ラップ対象の C++ インスタンスを保持する
-    def __cinit__(self, int x0, int y0, int x1, int y1):
-        self.thisptr = new Rectangle(x0, y0, x1, y1)
-    def __dealloc__(self):
-        del self.thisptr
-    def getLength(self):
-        return self.thisptr.getLength()
-    def getHeight(self):
-        return self.thisptr.getHeight()
-    def getArea(self):
-        return self.thisptr.getArea()
-    def move(self, dx, dy):
-        self.thisptr.move(dx, dy)
+cdef extern from "Rectangle.h":
+    cdef cppclass MyClass:
+        MyClass() except +
+        void run(double* X, int N, int D, double* Y)
+
+def run(np.ndarray[np.double_t, ndim=2] X):
+    X = np.ascontiguousarray(X)
+    cdef np.ndarray[np.double_t, ndim=2, mode="c"] Y = np.zeros_like(X)
+
+    cdef MyClass myclass
+    myclass = MyClass()
+    myclass.run(&X[0,0], X.shape[0], X.shape[1], &Y[0,0])
+
+    return Y

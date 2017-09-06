@@ -10,6 +10,8 @@ void MyClass::run(double* X, int N, int D, double* Y){
         for (int j = 0; j < D; j++)
         {
             Y[i*D+j]=X[i*D+j] +1;
+            //below raise error:subscripted value is not an array, pointer, or vector
+            //Y[i][j]=X[i][j] +1;
         }
     }
 }
